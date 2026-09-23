@@ -1,0 +1,7 @@
+venv/
+__pycache__/
+*.pyc
+generated_images/*
+.env
+.ipynb_checkpoints/
+.hf_cache/
