@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>AI Text Generator</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h1>AI Text Generator</h1>
+
+        <p class="subtitle">
+            Generate text using Hugging Face Transformers
+        </p>
+
+        <div class="card">
+
+            <label for="prompt">Enter your prompt</label>
+
+            <textarea
+                id="prompt"
+                placeholder="Example: Artificial intelligence is transforming..."
+            ></textarea>
+
+            <button id="generateBtn" onclick="generateText()">
+                Generate Text
+            </button>
+
+            <div id="loading" class="loading">
+                Generating text...
+            </div>
+
+            <div class="result-section">
+
+                <label>Generated Text</label>
+
+                <div id="result" class="result">
+                    Your generated text will appear here...
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+        async function generateText() {
+
+            const prompt = document.getElementById("prompt").value.trim();
+            const result = document.getElementById("result");
+            const loading = document.getElementById("loading");
+            const button = document.getElementById("generateBtn");
+
+            if (!prompt) {
+                result.innerText = "Please enter a prompt.";
+                return;
+            }
+
+            loading.style.display = "block";
+            button.disabled = true;
+            result.innerText = "";
+
+            try {
+
+                const response = await fetch("/generate", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        prompt: prompt
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.error) {
+                    result.innerText = "Error: " + data.error;
+                } else {
+                    result.innerText = data.text;
+                }
+
+            } catch (error) {
+
+                result.innerText =
+                    "Something went wrong. Please try again.";
+
+            } finally {
+
+                loading.style.display = "none";
+                button.disabled = false;
+
+            }
+        }
+    </script>
+
+</body>
+</html>
