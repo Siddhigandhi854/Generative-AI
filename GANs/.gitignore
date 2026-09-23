@@ -1,0 +1,26 @@
+htmlcov/
+.nox/
+.hypothesis/
+
+# Editor & IDE Configs
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS System Files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+
+# Python
+__pycache__/
+*.py[cod]
+
+# Environment / Secrets
+.env
+
+# Temporary Logs & Scratch Files
+*.log
+scratch/
+.system_generated/

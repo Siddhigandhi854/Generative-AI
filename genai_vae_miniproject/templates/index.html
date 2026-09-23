@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>VAE Latent Space Explorer</title>
+
+    <!-- CSS FILE -->
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+
+<body>
+
+<div class="container">
+
+    <h1>LATENT SPACE EXPLORER</h1>
+
+    <p class="subtitle">
+        Click anywhere inside the latent space
+        to select Z1 and Z2.
+    </p>
+
+
+    <div class="main-container">
+
+
+        <!-- =====================================
+             LEFT SIDE: LATENT SPACE
+        ====================================== -->
+
+        <div class="card">
+
+            <h2>Latent Space</h2>
+
+            <div class="latent-wrapper">
+
+                <div class="z2-label">
+                    Z2 ↑
+                </div>
+
+
+                <div id="latentSpace"
+                     class="latent-space">
+
+                    <!-- Axes -->
+
+                    <div class="horizontal-axis"></div>
+
+                    <div class="vertical-axis"></div>
+
+
+                    <!-- Selected point -->
+
+                    <div id="point"
+                         class="point">
+                    </div>
+
+                </div>
+
+
+                <div class="z1-label">
+                    Z1 →
+                </div>
+
+            </div>
+
+
+            <!-- Z Values -->
+
+            <div class="values">
+
+                <div class="value-box">
+
+                    <strong>Z1:</strong>
+
+                    <span id="z1Value">
+                        0.00
+                    </span>
+
+                </div>
+
+
+                <div class="value-box">
+
+                    <strong>Z2:</strong>
+
+                    <span id="z2Value">
+                        0.00
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- Buttons -->
+
+            <button id="generateBtn">
+                Generate Image
+            </button>
+
+
+            <button id="randomBtn">
+                🎲 Random
+            </button>
+
+        </div>
+
+
+        <!-- =====================================
+             RIGHT SIDE: GENERATED IMAGE
+        ====================================== -->
+
+        <div class="card">
+
+            <h2>Generated Image</h2>
+
+
+            <div class="image-box">
+
+                <p id="placeholder">
+                    Click inside the latent space
+                </p>
+
+
+                <img
+                    id="generatedImage"
+                    alt="Generated MNIST Image"
+                >
+
+            </div>
+
+
+            <p id="latentInfo">
+                Latent Vector:
+                [0.00, 0.00]
+            </p>
+
+            <p id="predictionInfo">
+                Predicted Digit: --
+            </p>
+
+
+            <div id="loading"
+                 class="loading hidden">
+
+                Generating Image...
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+/* ==============================================
+   GET HTML ELEMENTS
+============================================== */
+
+const latentSpace =
+    document.getElementById("latentSpace");
+
+const point =
+    document.getElementById("point");
+
+const z1Value =
+    document.getElementById("z1Value");
+
+const z2Value =
+    document.getElementById("z2Value");
+
+const generateBtn =
+    document.getElementById("generateBtn");
+
+const randomBtn =
+    document.getElementById("randomBtn");
+
+const generatedImage =
+    document.getElementById("generatedImage");
+
+const placeholder =
+    document.getElementById("placeholder");
+
+const loading =
+    document.getElementById("loading");
+
+const latentInfo =
+    document.getElementById("latentInfo");
+
+const predictionInfo =
+    document.getElementById("predictionInfo");
+
+
+/* ==============================================
+   INITIAL LATENT VALUES
+============================================== */
+
+let z1 = 0;
+let z2 = 0;
+
+
+/* ==============================================
+   UPDATE POINT POSITION
+============================================== */
+
+function updatePoint() {
+
+    /*
+        Convert latent values:
+
+        Z1: -3 → +3
+        Z2: -3 → +3
+
+        into percentage positions.
+    */
+
+    const xPercent =
+        ((z1 + 3) / 6) * 100;
+
+    const yPercent =
+        ((3 - z2) / 6) * 100;
+
+
+    point.style.left =
+        xPercent + "%";
+
+    point.style.top =
+        yPercent + "%";
+
+
+    // Update displayed values
+
+    z1Value.textContent =
+        z1.toFixed(2);
+
+    z2Value.textContent =
+        z2.toFixed(2);
+
+
+    latentInfo.textContent =
+        `Latent Vector: [${z1.toFixed(2)}, ${z2.toFixed(2)}]`;
+
+    predictionInfo.textContent =
+        "Predicted Digit: generate image";
+}
+
+
+/* ==============================================
+   CLICK INSIDE LATENT SPACE
+============================================== */
+
+latentSpace.addEventListener(
+    "click",
+    function(event) {
+
+        const rect =
+            latentSpace.getBoundingClientRect();
+
+
+        // Get click coordinates
+
+        const x =
+            event.clientX - rect.left;
+
+        const y =
+            event.clientY - rect.top;
+
+
+        // Convert to percentage
+
+        const xPercent =
+            x / rect.width;
+
+        const yPercent =
+            y / rect.height;
+
+
+        // Convert to latent values
+
+        z1 =
+            (xPercent * 6) - 3;
+
+        z2 =
+            3 - (yPercent * 6);
+
+
+        // Update point
+
+        updatePoint();
+
+    }
+);
+
+
+/* ==============================================
+   GENERATE IMAGE
+============================================== */
+
+async function generateImage() {
+
+    loading.classList.remove("hidden");
+
+    generateBtn.disabled = true;
+    randomBtn.disabled = true;
+
+
+    try {
+
+        const response =
+            await fetch(
+                "/generate",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body: JSON.stringify({
+                        z1: z1,
+                        z2: z2
+                    })
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (data.success) {
+
+            generatedImage.src =
+                "data:image/png;base64,"
+                + data.image;
+
+
+            generatedImage.style.display =
+                "block";
+
+
+            placeholder.style.display =
+                "none";
+
+            predictionInfo.textContent =
+                `Predicted Digit: ${data.predicted_digit} `
+                + `(${(data.confidence * 100).toFixed(1)}% confidence)`;
+
+        }
+
+        else {
+
+            alert(
+                "Error: "
+                + data.error
+            );
+
+        }
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+        alert(
+            "Error generating image."
+        );
+
+    }
+
+
+    finally {
+
+        loading.classList.add("hidden");
+
+        generateBtn.disabled = false;
+        randomBtn.disabled = false;
+
+    }
+
+}
+
+
+/* ==============================================
+   GENERATE BUTTON
+============================================== */
+
+generateBtn.addEventListener(
+    "click",
+    generateImage
+);
+
+
+/* ==============================================
+   RANDOM BUTTON
+============================================== */
+
+randomBtn.addEventListener(
+    "click",
+    function() {
+
+        // Generate random Z1 and Z2
+
+        z1 =
+            (Math.random() * 6) - 3;
+
+        z2 =
+            (Math.random() * 6) - 3;
+
+
+        // Update UI
+
+        updatePoint();
+
+
+        // Generate image automatically
+
+        generateImage();
+
+    }
+);
+
+
+/* ==============================================
+   INITIALIZE
+============================================== */
+
+updatePoint();
+
+</script>
+
+</body>
+
+</html>

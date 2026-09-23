@@ -1,0 +1,464 @@
+/* ==========================================================
+   Global
+========================================================== */
+
+* {
+    box-sizing: border-box;
+}
+
+
+body {
+
+    margin: 0;
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+    background:
+        #f4f5f7;
+
+    color:
+        #202124;
+
+}
+
+
+
+/* ==========================================================
+   Page
+========================================================== */
+
+.page {
+
+    min-height: 100vh;
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: flex-start;
+
+    padding: 38px 20px;
+
+}
+
+
+
+/* ==========================================================
+   Main Card
+========================================================== */
+
+.card {
+
+    width: 100%;
+
+    max-width: 490px;
+
+    background: white;
+
+    border-radius: 18px;
+
+    padding: 28px 24px 32px;
+
+    box-shadow:
+        0 4px 18px rgba(
+            0,
+            0,
+            0,
+            0.08
+        );
+
+}
+
+
+
+/* ==========================================================
+   Heading
+========================================================== */
+
+h1 {
+
+    margin: 0;
+
+    text-align: center;
+
+    font-size: 26px;
+
+    font-weight: 700;
+
+    color:
+        #202124;
+
+}
+
+
+.subtitle {
+
+    text-align: center;
+
+    color:
+        #777;
+
+    font-size: 13px;
+
+    line-height: 1.5;
+
+    margin:
+        10px auto 22px;
+
+    max-width: 410px;
+
+}
+
+
+
+/* ==========================================================
+   Section
+========================================================== */
+
+.section {
+
+    margin-top: 10px;
+
+}
+
+
+.section h2,
+.image-section h2 {
+
+    text-align: center;
+
+    font-size: 18px;
+
+    margin:
+        0 0 14px;
+
+    font-weight: 700;
+
+}
+
+
+
+/* ==========================================================
+   Digit Grid
+========================================================== */
+
+.digit-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(5, 1fr);
+
+    gap: 8px;
+
+}
+
+
+.digit-btn {
+
+    height: 40px;
+
+    border:
+        1px solid #dedede;
+
+    background:
+        #ffffff;
+
+    border-radius: 8px;
+
+    font-size: 15px;
+
+    cursor: pointer;
+
+    transition:
+        0.2s ease;
+
+    color:
+        #222;
+
+}
+
+
+.digit-btn:hover {
+
+    border-color:
+        #b9b9b9;
+
+    background:
+        #f8f8f8;
+
+}
+
+
+.digit-btn.active {
+
+    background:
+        #111827;
+
+    color:
+        white;
+
+    border-color:
+        #111827;
+
+}
+
+
+
+/* ==========================================================
+   Selected Number
+========================================================== */
+
+.selected-info {
+
+    text-align: center;
+
+    font-size: 14px;
+
+    margin:
+        16px 0;
+
+    color:
+        #555;
+
+}
+
+
+#selectedDigit {
+
+    font-weight: 700;
+
+    color:
+        #111827;
+
+}
+
+
+
+/* ==========================================================
+   Generate Button
+========================================================== */
+
+.generate-btn {
+
+    width: 100%;
+
+    height: 42px;
+
+    border: none;
+
+    border-radius: 7px;
+
+    background:
+        #111827;
+
+    color: white;
+
+    font-size: 13px;
+
+    font-weight: 500;
+
+    cursor: pointer;
+
+    transition:
+        0.2s ease;
+
+}
+
+
+.generate-btn:hover {
+
+    background:
+        #273244;
+
+}
+
+
+.generate-btn:disabled {
+
+    opacity: 0.6;
+
+    cursor:
+        not-allowed;
+
+}
+
+
+
+/* ==========================================================
+   Loading
+========================================================== */
+
+.loading {
+
+    text-align: center;
+
+    margin-top: 12px;
+
+    font-size: 13px;
+
+    color:
+        #777;
+
+}
+
+
+.hidden {
+
+    display: none !important;
+
+}
+
+
+
+/* ==========================================================
+   Error
+========================================================== */
+
+.error {
+
+    margin-top: 12px;
+
+    padding: 10px;
+
+    border-radius: 7px;
+
+    background:
+        #fff0f0;
+
+    border:
+        1px solid #ffd0d0;
+
+    color:
+        #c0392b;
+
+    font-size: 12px;
+
+    line-height: 1.4;
+
+}
+
+
+
+/* ==========================================================
+   Image Section
+========================================================== */
+
+.image-section {
+
+    margin-top: 28px;
+
+}
+
+
+.image-box {
+
+    min-height: 210px;
+
+    border:
+        1px solid #e0e0e0;
+
+    border-radius: 10px;
+
+    background:
+        #fafafa;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: 20px;
+
+}
+
+
+.image-box img {
+
+    width: 180px;
+
+    height: 180px;
+
+    image-rendering:
+        pixelated;
+
+    object-fit: contain;
+
+    display: none;
+
+    background:
+        white;
+
+    border:
+        1px solid #eee;
+
+}
+
+
+#placeholder {
+
+    color:
+        #999;
+
+    font-size: 13px;
+
+    text-align: center;
+
+}
+
+
+
+/* ==========================================================
+   Mobile
+========================================================== */
+
+@media (max-width: 500px) {
+
+
+    .page {
+
+        padding:
+            20px 12px;
+
+    }
+
+
+    .card {
+
+        padding:
+            24px 18px 28px;
+
+        border-radius:
+            14px;
+
+    }
+
+
+    h1 {
+
+        font-size:
+            23px;
+
+    }
+
+
+    .digit-grid {
+
+        gap:
+            6px;
+
+    }
+
+
+    .digit-btn {
+
+        height:
+            38px;
+
+    }
+
+}
