@@ -1,0 +1,80 @@
+/* GAN Face Generator Custom Styles */
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fadeIn {
+    animation: fadeIn 0.3s ease-out forwards;
+}
+
+@keyframes spinReverse {
+    from {
+        transform: rotate(360deg);
+    }
+    to {
+        transform: rotate(0deg);
+    }
+}
+
+.animate-reverse {
+    animation: spinReverse 1.5s linear infinite;
+}
+
+.bg-size-200 {
+    background-size: 200% 200%;
+}
+
+/* Crisp Pixelated Image Rendering Option for 64x64 Neural Network Output */
+.crisp-pixel-rendering {
+    image-rendering: -moz-crisp-edges;
+    image-rendering: -webkit-crisp-edges;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+}
+
+.smooth-pixel-rendering {
+    image-rendering: auto;
+}
+
+/* Custom Scrollbar for Dark Mode Dashboard */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #090d16;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #1e293b;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #334155;
+}
+
+/* Skeleton Loading Wave Shimmer */
+@keyframes shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+.skeleton-shimmer {
+    background: linear-gradient(90deg, #1e293b 25%, #334155 37%, #1e293b 63%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+}
