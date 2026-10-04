@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Face Generator</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+    <div class="container">
+        <header class="topbar">
+            <div class="status-pill">
+                <span class="dot"></span>
+                http://127.0.0.1:5000
+            </div>
+            <div class="header-actions">
+                <span class="icon">◔</span>
+                <span class="icon">☆</span>
+            </div>
+        </header>
+
+        <section class="panel">
+            <h2>AI FACE GENERATOR</h2>
+
+            <div class="field">
+                <div class="field-row">
+                    <label>🎨 Color / Skin Tone</label>
+                    <span id="skinToneValue">0.5</span>
+                </div>
+                <input id="skinTone" type="range" min="0" max="1" step="0.01" value="0.5" />
+                <div class="labels">
+                    <small>Light</small>
+                    <small>Dark</small>
+                </div>
+            </div>
+
+            <div class="field">
+                <div class="field-row">
+                    <label>👤 Face Age</label>
+                    <span id="faceAgeValue">0.5</span>
+                </div>
+                <input id="faceAge" type="range" min="0" max="1" step="0.01" value="0.5" />
+                <div class="labels">
+                    <small>Young</small>
+                    <small>Mature</small>
+                </div>
+            </div>
+
+            <div class="field">
+                <div class="field-row">
+                    <label>😊 Expression</label>
+                    <span id="expressionValue">0.5</span>
+                </div>
+                <input id="expression" type="range" min="0" max="1" step="0.01" value="0.5" />
+                <div class="labels">
+                    <small>Neutral</small>
+                    <small>Smile</small>
+                </div>
+            </div>
+
+            <div class="field">
+                <div class="field-row">
+                    <label>🎲 Variation / Seed</label>
+                    <span id="variationValue">0.5</span>
+                </div>
+                <input id="variation" type="range" min="0" max="1" step="0.01" value="0.5" />
+            </div>
+
+            <div class="seed-box">
+                <label for="seed">Seed</label>
+                <input id="seed" type="number" min="0" placeholder="Random" />
+            </div>
+
+            <div class="helper-text">
+                These controls behave as latent-style adjustments. They work best when the trained model has learned the corresponding attributes.
+            </div>
+
+            <button id="generateBtn" type="button">✨ GENERATE FACE</button>
+        </section>
+
+        <section id="gallery" class="gallery"></section>
+    </div>
+
+    <script>
+        const controls = {
+            skinTone: document.getElementById('skinTone'),
+            faceAge: document.getElementById('faceAge'),
+            expression: document.getElementById('expression'),
+            variation: document.getElementById('variation')
+        };
+
+        const valueLabels = {
+            skinTone: document.getElementById('skinToneValue'),
+            faceAge: document.getElementById('faceAgeValue'),
+            expression: document.getElementById('expressionValue'),
+            variation: document.getElementById('variationValue')
+        };
+
+        Object.entries(controls).forEach(([key, input]) => {
+            const valueNode = valueLabels[key];
+            input.addEventListener('input', () => {
+                valueNode.textContent = Number(input.value).toFixed(2);
+            });
+        });
+
+        const generateBtn = document.getElementById('generateBtn');
+        const gallery = document.getElementById('gallery');
+
+        generateBtn.addEventListener('click', async () => {
+            generateBtn.disabled = true;
+            generateBtn.textContent = 'Generating...';
+
+            const payload = {
+                num_images: 1,
+                skin_tone: Number(controls.skinTone.value),
+                face_age: Number(controls.faceAge.value),
+                expression: Number(controls.expression.value),
+                variation: Number(controls.variation.value),
+                truncation: 0.6 + Number(controls.faceAge.value) * 0.25,
+                seed: document.getElementById('seed').value
+            };
+
+            try {
+                const response = await fetch('/generate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+                if (!result.success) {
+                    throw new Error(result.error || 'Generation failed.');
+                }
+
+                gallery.innerHTML = '';
+                result.images.forEach((src) => {
+                    const imageWrap = document.createElement('div');
+                    imageWrap.className = 'image-card';
+
+                    const img = document.createElement('img');
+                    img.src = src;
+                    img.alt = 'Generated portrait';
+                    imageWrap.appendChild(img);
+                    gallery.appendChild(imageWrap);
+                });
+            } catch (error) {
+                alert(error.message || 'Something went wrong while generating faces.');
+            } finally {
+                generateBtn.disabled = false;
+                generateBtn.textContent = '✨ GENERATE FACE';
+            }
+        });
+    </script>
+</body>
+</html>
