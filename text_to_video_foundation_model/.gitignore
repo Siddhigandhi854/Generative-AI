@@ -1,0 +1,38 @@
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Python cache and bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+
+# Video outputs (keep .gitkeep so folder exists on clone)
+outputs/*
+!outputs/.gitkeep
+
+# Large model caches and weights
+.cache/
+huggingface/
+*.bin
+*.safetensors
+*.pt
+*.pth
+
+# IDE and OS files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# Environment variables
+.env
+.env.local

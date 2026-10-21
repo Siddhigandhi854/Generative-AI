@@ -1,0 +1,14 @@
+# Text-to-Video Foundation Model Dependencies
+# Install PyTorch with CUDA support first:
+# Windows/Linux (CUDA 12.1): pip install torch torchvision --index-url https://download.pytorch.org/whl/cu121
+# CPU Only: pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+
+diffusers>=0.30.0,<0.36.0
+transformers>=4.41.0,<4.47.0
+accelerate>=0.30.0
+safetensors>=0.4.3
+gradio>=4.44.0,<6.0.0
+imageio>=2.34.0
+imageio-ffmpeg>=0.5.1
+pillow>=10.0.0
+numpy>=1.24.0,<3.0.0
