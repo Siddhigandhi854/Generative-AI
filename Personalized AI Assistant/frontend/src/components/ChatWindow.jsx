@@ -175,7 +175,7 @@ function ChatWindow() {
 
       {/* Mode Explanation Banner */}
       <div className="mode-explanation-strip">
-        <Info size={14} className="text-primary flex-shrink-0" />
+        <Info size={14} className="flex-shrink-0" />
         <span>{getModeDescription()}</span>
       </div>
 
@@ -184,7 +184,7 @@ function ChatWindow() {
         {messages.length === 0 && (
           <div className="chat-placeholder">
             <div className="placeholder-icon-circle">
-              <Sparkles size={28} className="text-primary" />
+              <Sparkles size={28} />
             </div>
             <h4>Personalized AI Research Assistant</h4>
             <p className="placeholder-sub">
@@ -216,7 +216,7 @@ function ChatWindow() {
         {loading && (
           <div className="message-container assistant-side">
             <div className="message-avatar">
-              <Loader2 size={18} className="spin text-primary" />
+              <Loader2 size={18} className="spin" />
             </div>
             <div className="message-bubble thinking-bubble">
               <div className="thinking-dots">

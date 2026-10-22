@@ -95,9 +95,9 @@ function DocumentUploader({ onUploadSuccess }) {
         <div className="dropzone-inner">
           <div className="dropzone-icon-circle">
             {uploading ? (
-              <Loader2 size={28} className="spin text-primary" />
+              <Loader2 size={28} className="spin" />
             ) : (
-              <UploadCloud size={28} className="text-primary" />
+              <UploadCloud size={28} />
             )}
           </div>
 

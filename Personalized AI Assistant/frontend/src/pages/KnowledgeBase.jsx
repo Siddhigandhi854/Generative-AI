@@ -69,7 +69,7 @@ function KnowledgeBase() {
       {/* Ingestion & Scanned PDF Notice */}
       <section className="info-callout-card">
         <div className="callout-header">
-          <Info size={18} className="text-primary" />
+          <Info size={18} />
           <h4>Document Processing & Scanned PDF Guidelines</h4>
         </div>
         <div className="callout-grid">

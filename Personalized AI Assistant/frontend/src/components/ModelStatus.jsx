@@ -43,19 +43,19 @@ function ModelStatus({ onRefresh }) {
   return (
     <div className="model-status-card">
       <div className="status-item">
-        <Sparkles size={16} className="text-primary" />
+        <Sparkles size={16} />
         <span className="label">Active Model:</span>
         <strong className="value">{status.model_name?.split('/')[1] || status.model_name}</strong>
       </div>
 
       <div className="status-item">
-        <Cpu size={16} className="text-secondary" />
+        <Cpu size={16} />
         <span className="label">Compute:</span>
         <span className="badge badge-neutral">{status.device?.toUpperCase() || 'CPU'}</span>
       </div>
 
       <div className="status-item">
-        <HardDrive size={16} className="text-muted" />
+        <HardDrive size={16} />
         <span className="label">RAM Available:</span>
         <span className="value">{status.system_ram_available_gb} GB</span>
       </div>

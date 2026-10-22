@@ -104,7 +104,7 @@ function Dashboard() {
       {/* Metrics Cards Grid */}
       <section className="stats-grid">
         <div className="stat-card">
-          <div className="icon-box icon-box-blue">
+          <div className="icon-box">
             <FileText size={20} />
           </div>
           <div>
@@ -115,7 +115,7 @@ function Dashboard() {
         </div>
 
         <div className="stat-card">
-          <div className="icon-box icon-box-purple">
+          <div className="icon-box">
             <Layers3 size={20} />
           </div>
           <div>
@@ -126,7 +126,7 @@ function Dashboard() {
         </div>
 
         <div className="stat-card">
-          <div className="icon-box icon-box-green">
+          <div className="icon-box">
             <Sparkles size={20} />
           </div>
           <div>
@@ -203,7 +203,7 @@ function Dashboard() {
           <h3>Quick Project Actions</h3>
           <div className="action-buttons-stack">
             <button className="action-row-btn" onClick={() => navigate('/knowledge-base')}>
-              <Database size={18} className="text-primary" />
+              <Database size={18} />
               <div className="action-row-text">
                 <strong>Upload & Ingest Documents</strong>
                 <p>Add PDF, DOCX, or TXT files to build your personalized knowledge base.</p>
@@ -212,7 +212,7 @@ function Dashboard() {
             </button>
 
             <button className="action-row-btn" onClick={() => navigate('/assistant')}>
-              <Bot size={18} className="text-secondary" />
+              <Bot size={18} />
               <div className="action-row-text">
                 <strong>Query Document-Grounded Assistant</strong>
                 <p>Interact with the conversational interface and inspect citation excerpts.</p>
@@ -221,7 +221,7 @@ function Dashboard() {
             </button>
 
             <button className="action-row-btn" onClick={() => navigate('/model-comparison')}>
-              <BarChart3 size={18} className="text-success" />
+              <BarChart3 size={18} />
               <div className="action-row-text">
                 <strong>Model Comparison & Benchmark</strong>
                 <p>View real quantitative metrics (Token F1, Groundedness, Latency) across modes.</p>

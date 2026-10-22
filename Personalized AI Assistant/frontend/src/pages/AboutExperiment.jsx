@@ -80,23 +80,23 @@ function AboutExperiment() {
           </p>
           <div className="objectives-list">
             <div className="objective-item">
-              <CheckCircle2 size={16} className="text-primary" />
+              <CheckCircle2 size={16} />
               <span>Implement a modular document ingestion pipeline for PDF (preserving page numbers via PyMuPDF), Word (.docx), and plain text (.txt).</span>
             </div>
             <div className="objective-item">
-              <CheckCircle2 size={16} className="text-primary" />
+              <CheckCircle2 size={16} />
               <span>Generate 384-dimensional dense semantic embeddings using Sentence Transformers (all-MiniLM-L6-v2) and index them in a persistent FAISS vector store.</span>
             </div>
             <div className="objective-item">
-              <CheckCircle2 size={16} className="text-primary" />
+              <CheckCircle2 size={16} />
               <span>Integrate an instruction-tuned open-source model (Qwen2.5) with strict grounding, prompt injection isolation, and source citation verification.</span>
             </div>
             <div className="objective-item">
-              <CheckCircle2 size={16} className="text-primary" />
+              <CheckCircle2 size={16} />
               <span>Implement a parameter-efficient fine-tuning (PEFT LoRA) workflow with rank decomposition and loss curve tracking.</span>
             </div>
             <div className="objective-item">
-              <CheckCircle2 size={16} className="text-primary" />
+              <CheckCircle2 size={16} />
               <span>Conduct a comparative benchmark across Base LLM, RAG, and Fine-Tuned modes recording Token F1 correctness, groundedness, and latency.</span>
             </div>
           </div>

@@ -99,17 +99,17 @@ function DocumentList({ documents, stats, onRefresh }) {
       {/* Vector Stats Summary Bar */}
       <div className="stats-summary-bar">
         <div className="summary-item">
-          <Layers size={16} className="text-primary" />
+          <Layers size={16} />
           <span className="summary-label">FAISS Chunks:</span>
           <strong>{stats?.vector_stats?.total_chunks ?? 0}</strong>
         </div>
         <div className="summary-item">
-          <FileText size={16} className="text-secondary" />
+          <FileText size={16} />
           <span className="summary-label">Indexed Documents:</span>
           <strong>{stats?.vector_stats?.unique_documents ?? 0}</strong>
         </div>
         <div className="summary-item">
-          <FileSpreadsheet size={16} className="text-muted" />
+          <FileSpreadsheet size={16} />
           <span className="summary-label">Vector Dimension:</span>
           <strong>{stats?.vector_stats?.dimension || 384}d (Cosine IP)</strong>
         </div>
