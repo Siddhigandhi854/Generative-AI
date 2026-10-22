@@ -18,6 +18,7 @@ MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024
 CHUNK_SIZE = int(os.getenv('CHUNK_SIZE', '500'))
 CHUNK_OVERLAP = int(os.getenv('CHUNK_OVERLAP', '100'))
 TOP_K = int(os.getenv('TOP_K', '5'))
+SIMILARITY_THRESHOLD = float(os.getenv('SIMILARITY_THRESHOLD', '0.05'))
 
 MODEL_NAME = os.getenv('MODEL_NAME', 'Qwen/Qwen2.5-0.5B-Instruct')
 EMBEDDING_MODEL = os.getenv('EMBEDDING_MODEL', 'sentence-transformers/all-MiniLM-L6-v2')

@@ -6,7 +6,7 @@ from typing import List, Dict, Any, Optional
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
-from backend.app.config import STORAGE_DIR, TOP_K
+from backend.app.config import STORAGE_DIR, TOP_K, SIMILARITY_THRESHOLD
 from backend.app.services.llm_service import get_llm_service
 from backend.app.services.rag_service import RAGService
 from backend.app.services.fine_tuning_service import FineTuningService
@@ -97,8 +97,8 @@ async def chat(payload: ChatRequestPayload):
             )
         else:
             retrieval_score = hits[0].get("score")
-            # If highest retrieval similarity is very low (e.g. < 0.25), consider it out-of-context
-            if retrieval_score is not None and retrieval_score < 0.25:
+            # If highest retrieval similarity is below threshold, consider it out-of-context
+            if retrieval_score is not None and retrieval_score < SIMILARITY_THRESHOLD:
                 is_unsupported = True
                 answer = (
                     "I cannot answer this based on the available documents. "
