@@ -1,0 +1,11 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "npm --prefix generative-ai-lab/frontend install && npm --prefix generative-ai-lab/frontend run build",
+  "outputDirectory": "generative-ai-lab/frontend/dist",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}

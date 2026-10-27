@@ -1,0 +1,9 @@
+{
+  "name": "generative-ai-lab-platform",
+  "version": "2.0.0",
+  "private": true,
+  "scripts": {
+    "build": "npm --prefix generative-ai-lab/frontend install && npm --prefix generative-ai-lab/frontend run build",
+    "dev": "npm --prefix generative-ai-lab/frontend run dev"
+  }
+}
