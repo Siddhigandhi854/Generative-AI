@@ -2,6 +2,11 @@ import sys
 import os
 import importlib.util
 
+# Low-memory cloud settings
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
+os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
+
 base_dir = os.path.dirname(os.path.abspath(__file__))
 backend_dir = os.path.join(base_dir, "generative-ai-lab", "backend")
 if backend_dir not in sys.path:

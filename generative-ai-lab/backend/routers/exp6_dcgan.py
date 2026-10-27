@@ -6,8 +6,6 @@ from fastapi import APIRouter, HTTPException
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from typing import Optional, List
-import torch
-import torch.nn as nn
 from config import config
 
 router = APIRouter(prefix="/api/exp6", tags=["Experiment 6: DCGAN Generation"])
@@ -17,44 +15,49 @@ class DCGANRequest(BaseModel):
     seed: Optional[int] = None
     latent_dim: int = 100
 
-class DCGANGenerator(nn.Module):
-    """
-    Classic Deep Convolutional Generative Adversarial Network (DCGAN) Generator
-    Architecture based on Radford et al. (2015) trained on the CelebA human face dataset.
-    Takes 100-dimensional Gaussian noise z ~ N(0, I) and projects through 5 transposed
-    convolutions with Batch Normalization and ReLU activations to produce 64x64x3 RGB faces.
-    """
-    def __init__(self, nz: int = 100, ngf: int = 64, nc: int = 3):
-        super().__init__()
-        self.main = nn.Sequential(
-            # Input: latent vector Z (batch_size, nz, 1, 1) -> (ngf*8) x 4 x 4
-            nn.ConvTranspose2d(nz, ngf * 8, 4, 1, 0, bias=False),
-            nn.BatchNorm2d(ngf * 8),
-            nn.ReLU(True),
-            # State: (ngf*8) x 4 x 4 -> (ngf*4) x 8 x 8
-            nn.ConvTranspose2d(ngf * 8, ngf * 4, 4, 2, 1, bias=False),
-            nn.BatchNorm2d(ngf * 4),
-            nn.ReLU(True),
-            # State: (ngf*4) x 8 x 8 -> (ngf*2) x 16 x 16
-            nn.ConvTranspose2d(ngf * 4, ngf * 2, 4, 2, 1, bias=False),
-            nn.BatchNorm2d(ngf * 2),
-            nn.ReLU(True),
-            # State: (ngf*2) x 16 x 16 -> (ngf) x 32 x 32
-            nn.ConvTranspose2d(ngf * 2, ngf, 4, 2, 1, bias=False),
-            nn.BatchNorm2d(ngf),
-            nn.ReLU(True),
-            # State: (ngf) x 32 x 32 -> (nc) x 64 x 64
-            nn.ConvTranspose2d(ngf, nc, 4, 2, 1, bias=False),
-            nn.Tanh()
-            # Output: 3 x 64 x 64 pixel values normalized in [-1, 1]
-        )
+_DCGAN_CLASS = None
 
-    def forward(self, x):
-        return self.main(x)
+def _get_dcgan_class():
+    global _DCGAN_CLASS
+    if _DCGAN_CLASS is None:
+        import torch
+        import torch.nn as nn
 
-_GENERATOR: Optional[DCGANGenerator] = None
+        class DCGANGenerator(nn.Module):
+            """
+            Classic Deep Convolutional Generative Adversarial Network (DCGAN) Generator
+            Architecture based on Radford et al. (2015) trained on the CelebA human face dataset.
+            Takes 100-dimensional Gaussian noise z ~ N(0, I) and projects through 5 transposed
+            convolutions with Batch Normalization and ReLU activations to produce 64x64x3 RGB faces.
+            """
+            def __init__(self, nz: int = 100, ngf: int = 64, nc: int = 3):
+                super().__init__()
+                self.main = nn.Sequential(
+                    nn.ConvTranspose2d(nz, ngf * 8, 4, 1, 0, bias=False),
+                    nn.BatchNorm2d(ngf * 8),
+                    nn.ReLU(True),
+                    nn.ConvTranspose2d(ngf * 8, ngf * 4, 4, 2, 1, bias=False),
+                    nn.BatchNorm2d(ngf * 4),
+                    nn.ReLU(True),
+                    nn.ConvTranspose2d(ngf * 4, ngf * 2, 4, 2, 1, bias=False),
+                    nn.BatchNorm2d(ngf * 2),
+                    nn.ReLU(True),
+                    nn.ConvTranspose2d(ngf * 2, ngf, 4, 2, 1, bias=False),
+                    nn.BatchNorm2d(ngf),
+                    nn.ReLU(True),
+                    nn.ConvTranspose2d(ngf, nc, 4, 2, 1, bias=False),
+                    nn.Tanh()
+                )
 
-def get_dcgan_generator() -> Optional[DCGANGenerator]:
+            def forward(self, x):
+                return self.main(x)
+
+        _DCGAN_CLASS = DCGANGenerator
+    return _DCGAN_CLASS
+
+_GENERATOR = None
+
+def get_dcgan_generator():
     """Lazy-loads and caches the pretrained CelebA DCGAN generator."""
     global _GENERATOR
     if _GENERATOR is None:
@@ -65,7 +68,9 @@ def get_dcgan_generator() -> Optional[DCGANGenerator]:
         )
         if os.path.exists(model_path):
             try:
-                gen = DCGANGenerator(nz=100, ngf=64, nc=3)
+                import torch
+                cls = _get_dcgan_class()
+                gen = cls(nz=100, ngf=64, nc=3)
                 state_dict = torch.load(model_path, map_location="cpu")
                 gen.load_state_dict(state_dict)
                 gen.eval()
@@ -82,6 +87,7 @@ def synthesize_dcgan_face(seed: Optional[int]) -> np.ndarray:
     """
     gen = get_dcgan_generator()
     if gen is not None:
+        import torch
         if seed is not None:
             torch_gen = torch.Generator().manual_seed(int(seed))
         else:
@@ -101,15 +107,19 @@ def synthesize_dcgan_face(seed: Optional[int]) -> np.ndarray:
 
 @router.get("/status")
 def get_dcgan_status():
-    gen = get_dcgan_generator()
+    model_path = os.path.join(
+        os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+        "models",
+        "dcgan_generator.pth"
+    )
     return {
         "model": "DCGAN (Deep Convolutional Generative Adversarial Network)",
-        "framework": f"PyTorch {torch.__version__}",
+        "framework": "PyTorch (On-Demand)",
         "architecture": "Radford et al. 2015 (5 ConvTranspose2d + BatchNorm + ReLU/Tanh)",
         "dataset": "CelebA (Large-scale CelebFaces Attributes Dataset)",
         "latent_dimension": 100,
         "features": 64,
-        "model_loaded": gen is not None,
+        "model_loaded": os.path.exists(model_path),
         "target_domain": "Photorealistic CelebA Faces",
         "resolution": "64x64 RGB (upscaled to 256x256 with Lanczos interpolation)"
     }

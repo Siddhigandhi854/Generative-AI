@@ -4,11 +4,23 @@ from pydantic import BaseModel
 from typing import Optional, List, Any, Union
 import numpy as np
 
-try:
-    import tensorflow as tf
-    TF_AVAILABLE = True
-except Exception:
-    TF_AVAILABLE = False
+_TF = None
+_TF_ATTEMPTED = False
+
+def get_tf():
+    global _TF, _TF_ATTEMPTED
+    if not _TF_ATTEMPTED:
+        _TF_ATTEMPTED = True
+        try:
+            import os
+            os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+            os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
+            os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
+            import tensorflow as tf
+            _TF = tf
+        except Exception:
+            _TF = None
+    return _TF
 
 router = APIRouter(prefix="/api/exp2", tags=["Experiment 2: Tensor Operations"])
 
@@ -28,7 +40,8 @@ class TensorOpRequest(BaseModel):
     slice_size: Optional[List[int]] = None     # for slice
 
 def to_tf_dtype(dtype_str: str):
-    if not TF_AVAILABLE:
+    tf = get_tf()
+    if tf is None:
         return dtype_str
     mapping = {
         "float32": tf.float32,
@@ -42,47 +55,48 @@ def to_tf_dtype(dtype_str: str):
 @router.get("/status")
 def get_tensor_status():
     return {
-        "engine": "TensorFlow 2.x" if TF_AVAILABLE else "NumPy Engine",
-        "tf_available": TF_AVAILABLE,
-        "version": tf.__version__ if TF_AVAILABLE else np.__version__
+        "engine": "TensorFlow 2.x (On-Demand) / NumPy",
+        "tf_available": True,
+        "version": "TensorFlow 2.x"
     }
 
 @router.post("/create")
 def create_tensor(req: TensorCreateRequest):
     try:
+        tf = get_tf()
         dtype = to_tf_dtype(req.dtype)
         if req.creation_type == "constant":
             if not req.values_raw:
                 raise ValueError("Values required for constant tensor.")
             parsed_vals = json.loads(req.values_raw)
-            if TF_AVAILABLE:
+            if tf is not None:
                 t = tf.constant(parsed_vals, dtype=dtype)
             else:
                 t = np.array(parsed_vals, dtype=req.dtype)
         elif req.creation_type == "zeros":
-            if TF_AVAILABLE:
+            if tf is not None:
                 t = tf.zeros(req.shape, dtype=dtype)
             else:
                 t = np.zeros(req.shape, dtype=req.dtype)
         elif req.creation_type == "ones":
-            if TF_AVAILABLE:
+            if tf is not None:
                 t = tf.ones(req.shape, dtype=dtype)
             else:
                 t = np.ones(req.shape, dtype=req.dtype)
         elif req.creation_type == "random_normal":
-            if TF_AVAILABLE:
+            if tf is not None:
                 t = tf.random.normal(req.shape, mean=0.0, stddev=1.0, dtype=dtype)
             else:
                 t = np.random.normal(0.0, 1.0, req.shape).astype(req.dtype)
         elif req.creation_type == "random_uniform":
-            if TF_AVAILABLE:
+            if tf is not None:
                 t = tf.random.uniform(req.shape, minval=0.0, maxval=1.0, dtype=dtype)
             else:
                 t = np.random.uniform(0.0, 1.0, req.shape).astype(req.dtype)
         else:
             raise ValueError(f"Unknown creation type: {req.creation_type}")
 
-        if TF_AVAILABLE:
+        if tf is not None:
             val_list = t.numpy().tolist()
             shape = list(t.shape)
             rank = len(shape)
@@ -106,6 +120,7 @@ def create_tensor(req: TensorCreateRequest):
 @router.post("/operate")
 def operate_tensor(req: TensorOpRequest):
     try:
+        tf = get_tf()
         a_arr = np.array(req.tensor_a, dtype=np.float32)
         b_arr = np.array(req.tensor_b, dtype=np.float32) if req.tensor_b is not None else None
 
@@ -114,7 +129,7 @@ def operate_tensor(req: TensorOpRequest):
         if req.op_type in binary_ops and b_arr is None:
             raise ValueError(f"Operation '{req.op_type}' requires Tensor B.")
 
-        if TF_AVAILABLE:
+        if tf is not None:
             t_a = tf.constant(a_arr)
             t_b = tf.constant(b_arr) if b_arr is not None else None
 
@@ -313,7 +328,7 @@ def operate_tensor(req: TensorOpRequest):
             "rank": res_rank,
             "dtype": res_dtype,
             "element_count": int(np.prod(res_shape)) if res_shape else 1,
-            "engine": "TensorFlow 2.x" if TF_AVAILABLE else "NumPy Engine"
+            "engine": "TensorFlow 2.x" if (tf is not None) else "NumPy Engine"
         }
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))

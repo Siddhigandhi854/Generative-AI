@@ -7,8 +7,6 @@ import numpy as np
 from fastapi import APIRouter, UploadFile, File, Form, HTTPException
 from pydantic import BaseModel
 from typing import Optional, List, Dict, Any
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
 from config import config
 
 router = APIRouter(prefix="/api/exp9", tags=["Experiment 9: Personalized AI Assistant (RAG & LoRA)"])
@@ -24,8 +22,14 @@ class RAGStore:
     def __init__(self):
         self.documents: Dict[str, str] = {}  # doc_id -> filename
         self.chunks: List[DocumentChunk] = []
-        self.vectorizer = TfidfVectorizer(stop_words="english")
+        self.vectorizer = None
         self.tfidf_matrix = None
+
+    def _get_vectorizer(self):
+        if self.vectorizer is None:
+            from sklearn.feature_extraction.text import TfidfVectorizer
+            self.vectorizer = TfidfVectorizer(stop_words="english")
+        return self.vectorizer
 
     def add_document(self, filename: str, content: str) -> int:
         doc_id = str(uuid.uuid4())[:8]
@@ -51,7 +55,8 @@ class RAGStore:
         # Re-index TF-IDF matrix
         if self.chunks:
             all_texts = [c.text for c in self.chunks]
-            self.tfidf_matrix = self.vectorizer.fit_transform(all_texts)
+            vec = self._get_vectorizer()
+            self.tfidf_matrix = vec.fit_transform(all_texts)
 
         return chunks_added
 
@@ -59,7 +64,9 @@ class RAGStore:
         if not self.chunks or self.tfidf_matrix is None:
             return []
 
-        query_vec = self.vectorizer.transform([query])
+        from sklearn.metrics.pairwise import cosine_similarity
+        vec = self._get_vectorizer()
+        query_vec = vec.transform([query])
         scores = cosine_similarity(query_vec, self.tfidf_matrix)[0]
 
         top_indices = np.argsort(scores)[::-1][:top_k]

@@ -54,13 +54,17 @@ def fallback_vae_forward(z: np.ndarray) -> np.ndarray:
 
 @router.get("/status")
 def get_vae_status():
-    decoder = get_vae_decoder()
+    model_path = os.path.join(
+        os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+        "models",
+        "vae_decoder.keras"
+    )
     return {
         "model_type": "Convolutional Variational Autoencoder (Keras / TensorFlow 2.x)",
         "latent_space": "Continuous 2D Gaussian Manifold N(0, I)",
         "resolution": "28x28 (upscaled to 140x140 for inspection)",
-        "decoder_active": decoder is not None,
-        "framework": "TensorFlow 2.21.0 / Keras 3.15.1"
+        "decoder_active": os.path.exists(model_path),
+        "framework": "TensorFlow 2.x / Keras (On-Demand)"
     }
 
 @router.post("/generate")

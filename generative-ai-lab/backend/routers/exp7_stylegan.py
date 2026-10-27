@@ -7,7 +7,6 @@ from fastapi import APIRouter, HTTPException
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from typing import Optional, List
-import torch
 from config import config
 
 router = APIRouter(prefix="/api/exp7", tags=["Experiment 7: StyleGAN Synthesis"])
@@ -34,6 +33,7 @@ def get_stylegan_model():
             try:
                 if model_dir not in sys.path:
                     sys.path.insert(0, model_dir)
+                import torch
                 from style_gan import StyleGAN
                 from safetensors.torch import load_file
 
@@ -54,6 +54,7 @@ def synthesize_stylegan_portrait(seed: int, truncation_psi: float) -> np.ndarray
     """
     model = get_stylegan_model()
     if model is not None:
+        import torch
         torch_gen = torch.Generator().manual_seed(int(seed))
         z = torch.randn(1, 512, generator=torch_gen)
         
@@ -71,16 +72,21 @@ def synthesize_stylegan_portrait(seed: int, truncation_psi: float) -> np.ndarray
 
 @router.get("/status")
 def get_stylegan_status():
-    model = get_stylegan_model()
+    model_dir = os.path.join(
+        os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+        "models",
+        "stylegan_ffhq"
+    )
+    safetensors_path = os.path.join(model_dir, "model.safetensors")
     return {
         "model": "StyleGAN2 Architecture",
-        "framework": f"PyTorch {torch.__version__}",
+        "framework": "PyTorch (On-Demand)",
         "dataset": "FFHQ (Flickr-Faces-HQ)",
         "mapping_network": "8-layer MLP (Z_512 -> W_512 space)",
         "synthesis_network": "Progressive AdaIN Style-Modulated Convolutions (128x128)",
         "supports_truncation": True,
         "default_psi": 0.7,
-        "model_loaded": model is not None,
+        "model_loaded": os.path.exists(safetensors_path),
         "resolution": "128x128 RGB (upscaled to 256x256 with Lanczos interpolation)"
     }
 
