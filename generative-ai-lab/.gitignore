@@ -1,0 +1,32 @@
+# Python Virtual Environments
+venv/
+.venv/
+env/
+ENV/
+
+# Python Cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+
+# Node & Frontend
+node_modules/
+.npm
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS & Logs
+.DS_Store
+Thumbs.db
+*.log
+
+# Generated Outputs (keep folder structure)
+backend/outputs/*
+!backend/outputs/.gitkeep
+
+# Local Environment Secrets
+.env
+.env.local
