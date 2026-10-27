@@ -4,6 +4,14 @@
   "outputDirectory": "generative-ai-lab/frontend/dist",
   "rewrites": [
     {
+      "source": "/api/:path*",
+      "destination": "https://genai-lab-backend.onrender.com/api/:path*"
+    },
+    {
+      "source": "/outputs/:path*",
+      "destination": "https://genai-lab-backend.onrender.com/outputs/:path*"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
